@@ -55,4 +55,79 @@ public class Election {
 			this.voters.add(vote);
 		}
 	}
+	
+	public void compute() {
+		List<Candidate> remaining = new ArrayList<>(candidates.values());
+		
+		for (int round = 0; round < 3; round++) {
+			System.out.println();
+			System.out.println("== Round " + (round+1) + " ==");
+			if (remaining.size() <= 1) {
+				resultWinner = remaining.get(0);
+				break;
+			}
+			
+			// Create our votes map
+			Map<Candidate, Integer> votes = new HashMap<>();
+			remaining.forEach((candidate) -> {
+				votes.put(candidate, 0);
+			});
+			
+			// Count votes
+			final int[] totalVotesThisRound = new int[1]; // lambda below can only work with final values...
+			for (Voter v : voters) {
+				for (int i = 0; i < round+1; i++) {
+					if (remaining.contains(v.GetChoices().get(i))) {
+						totalVotesThisRound[0]++;
+						int cvotes = votes.get(v.GetChoices().get(i));
+						votes.put(v.GetChoices().get(i), cvotes + 1);
+						break;
+					}
+				}
+			}
+			
+			// Save our votes map as a result for this round
+			resultVotes.add(round, votes);
+			
+			// Print each candidate with its votes
+			votes.forEach((candidate, voteCount) -> {
+				System.out.println(candidate.GetName() + ": " + voteCount);
+			});
+			
+			// Check for majority vote
+			votes.forEach((candidate, voteCount) -> {
+				if (voteCount >= (totalVotesThisRound[0] / 2)) {
+					resultWinner = candidate;
+					System.out.println("Candidate won by majority vote: " + candidate.GetName());
+					return;
+				}
+			});			
+			
+			// Run eliminations
+			if (round >= 2) {
+				// Eliminate all but max
+				final Candidate[] highestVotes = new Candidate[1]; // this needs to be final to use in lambda
+				votes.forEach((candidate, voteCount) -> {
+					if (highestVotes[0] == null || votes.get(highestVotes[0]) > voteCount) {
+						remaining.remove(highestVotes[0]);
+						highestVotes[0] = candidate;
+						resultWinner = candidate;
+					}
+				});
+			} else {
+				// Eliminate 0 votes and lowest voted
+				final Candidate[] lowestVotes = new Candidate[1]; // this needs to be final to use in lambda
+				votes.forEach((candidate, voteCount) -> {
+					if (voteCount == 0) {
+						remaining.remove(candidate);
+					} else {
+						if (lowestVotes[0] == null || votes.get(lowestVotes[0]) > voteCount) {
+							lowestVotes[0] = candidate;
+						}
+					}
+				});
+				remaining.remove(lowestVotes[0]);
+			}
+		}
+	}
 }

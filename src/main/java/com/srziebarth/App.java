@@ -1,13 +1,46 @@
 package com.srziebarth;
 
-/**
- * Hello world!
- *
- */
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.srziebarth.Voter;
+import com.srziebarth.Candidate;
+
+
 public class App 
 {
+	
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        System.out.println( "Election Testing!" );
+        System.out.println();
+        
+        App test = new App();
+        test.Test();
     }
+    
+    public void Test() {
+		int ID1 = 1001;
+		int ID2 = 1002;
+		int ID3 = 1003;
+		
+		Candidate candidate1 = new Candidate("Dalinar Kholin");
+		Candidate candidate2 = new Candidate("Jasnah Kholin");
+		Candidate candidate3 = new Candidate("Renarin Kholin");
+		Candidate candidate4 = new Candidate("Kaladin Stormblessed");
+		Candidate candidate5 = new Candidate("Torol Sadeas");
+		Candidate candidate6 = new Candidate("Meridas Amaram");
+		
+		Voter voter1 = new Voter(ID1, Arrays.asList(candidate1, candidate2, candidate3));
+		Voter voter2 = new Voter(ID2, Arrays.asList(candidate1, candidate2, candidate4));
+		Voter voter3 = new Voter(ID3, Arrays.asList(candidate5, candidate6, candidate3));
+		
+		Election election = new Election();
+		election.addVoters(Arrays.asList(voter1, voter2, voter3));
+		election.compute();
+	}
 }

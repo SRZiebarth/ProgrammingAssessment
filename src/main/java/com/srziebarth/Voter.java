@@ -18,5 +18,4 @@ public class Voter {
 	public void SetID(int newID) {ID = newID;}
 	
 	public List<Candidate> GetChoices() {return voterChoices;}
-
 }

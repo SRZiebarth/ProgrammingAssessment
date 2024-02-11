@@ -10,5 +10,4 @@ public class Candidate {
 	
 	public String GetName() {return name;}
 	public void SetName(String newName) {name = newName;}
-
 }
