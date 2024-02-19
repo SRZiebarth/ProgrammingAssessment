@@ -26,29 +26,32 @@ public class Election {
 		this.resultVotes = new ArrayList<Map<Candidate, Integer>>();
 	}
 	
-	public List<Map<Candidate, Integer>> getResults() {
+	public List<Map<Candidate, Integer>> GetResults() {
 		return resultVotes;
 	}
 	
-	public Candidate getWinner() {
+	public Candidate GetWinner() {
 		if (resultWinner != null) {
 			return resultWinner;
 		} else {
-			throw new IllegalStateException("Election must be computed first.");
+			throw new IllegalStateException("Please run the Election first.");
 		}
 	}
 
 	public void addVoters(List<Voter> voters) {
 		for (Voter vote : voters) {
 			// Consolidate candidate objects
-			// Ensures that there is only one candidate object per candidate instead of 100s of identical objects
-			List<Candidate> ch = vote.GetChoices();			
-			for (int i = 0; i < ch.size(); i++) {
-				Candidate c = ch.get(i);
-				if (this.candidates.containsKey(c.GetName().toUpperCase())) {
-					ch.set(i, candidates.get(c.GetName().toUpperCase()));
+			// Ensures that there is only one candidate object per candidate instead of hundreds of identical objects
+			List<Candidate> choices = vote.GetChoices();			
+			for (int i = 0; i < choices.size(); i++) {
+				Candidate candidate = choices.get(i);
+				if (candidate == null) {
+					continue;
+				}
+				if (this.candidates.containsKey(candidate.GetName().toUpperCase())) {
+					choices.set(i, candidates.get(candidate.GetName().toUpperCase()));
 				} else {
-					candidates.put(c.GetName().toUpperCase(), c);
+					candidates.put(candidate.GetName().toUpperCase(), candidate);
 				}
 			}
 			
@@ -61,44 +64,44 @@ public class Election {
 		
 		for (int round = 0; round < 3; round++) {
 			System.out.println();
-			System.out.println("== Round " + (round+1) + " ==");
+			System.out.println("Round: " + (round + 1));
 			if (remaining.size() <= 1) {
 				resultWinner = remaining.get(0);
 				break;
 			}
 			
-			// Create our votes map
+			// Create votes map
 			Map<Candidate, Integer> votes = new HashMap<>();
 			remaining.forEach((candidate) -> {
 				votes.put(candidate, 0);
 			});
 			
 			// Count votes
-			final int[] totalVotesThisRound = new int[1]; // lambda below can only work with final values...
-			for (Voter v : voters) {
+			final int[] totalVotesThisRound = new int[1]; // Lambda below can only work with final values
+			for (Voter voter : voters) {
 				for (int i = 0; i < round+1; i++) {
-					if (remaining.contains(v.GetChoices().get(i))) {
+					if (remaining.contains(voter.GetChoices().get(i))) {
 						totalVotesThisRound[0]++;
-						int cvotes = votes.get(v.GetChoices().get(i));
-						votes.put(v.GetChoices().get(i), cvotes + 1);
+						int voteCount = votes.get(voter.GetChoices().get(i));
+						votes.put(voter.GetChoices().get(i), voteCount + 1);
 						break;
 					}
 				}
 			}
 			
-			// Save our votes map as a result for this round
+			// Save votes map as a result for this round
 			resultVotes.add(round, votes);
 			
-			// Print each candidate with its votes
+			// Print each candidate with their votes
 			votes.forEach((candidate, voteCount) -> {
 				System.out.println(candidate.GetName() + ": " + voteCount);
 			});
 			
-			// Check for majority vote
+			// Check for winner
 			votes.forEach((candidate, voteCount) -> {
 				if (voteCount >= (totalVotesThisRound[0] / 2)) {
 					resultWinner = candidate;
-					System.out.println("Candidate won by majority vote: " + candidate.GetName());
+					System.out.println("The Election Winner is: " + candidate.GetName());
 					return;
 				}
 			});			
@@ -106,7 +109,7 @@ public class Election {
 			// Run eliminations
 			if (round >= 2) {
 				// Eliminate all but max
-				final Candidate[] highestVotes = new Candidate[1]; // this needs to be final to use in lambda
+				final Candidate[] highestVotes = new Candidate[1]; // This needs to be final to use in lambda
 				votes.forEach((candidate, voteCount) -> {
 					if (highestVotes[0] == null || votes.get(highestVotes[0]) > voteCount) {
 						remaining.remove(highestVotes[0]);
@@ -115,8 +118,8 @@ public class Election {
 					}
 				});
 			} else {
-				// Eliminate 0 votes and lowest voted
-				final Candidate[] lowestVotes = new Candidate[1]; // this needs to be final to use in lambda
+				// Eliminate zero votes and lowest voted
+				final Candidate[] lowestVotes = new Candidate[1]; // This needs to be final to use in lambda
 				votes.forEach((candidate, voteCount) -> {
 					if (voteCount == 0) {
 						remaining.remove(candidate);

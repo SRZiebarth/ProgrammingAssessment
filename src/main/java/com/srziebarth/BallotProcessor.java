@@ -16,11 +16,13 @@ public class BallotProcessor
 	
     public static void main( String[] args )
     {
-        System.out.println( "Election Testing!" );
+        System.out.println( "Starting Elections..." );
         System.out.println();
         
-        BallotProcessor test = new BallotProcessor();
-        test.Test();
+//        BallotProcessor test = new BallotProcessor();
+//        test.Test();
+        UI ui = new UI();
+        ui.start();
     }
     
     public void Test() {
@@ -44,18 +46,31 @@ public class BallotProcessor
 //		election.compute();y
 
 		
-    	CSVReader test = new CSVReader("SmallListBallots.csv");
+//    	CSVReader test = new CSVReader("SmallListBallots.csv");
+//    	try {
+//			List<Voter> test2 = test.parseVoters();
+//			for (Voter v : test2) {
+//				System.out.println(v.GetID());
+//				for (Candidate c : v.GetChoices()) {
+//					System.out.println(c.GetName());
+//				}
+//			}
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+    	List<Voter> votes = new ArrayList();
+    	//CSVReader test = new CSVReader("SmallListBallots.csv");
+    	CSVReader test = new CSVReader("LargeListBallots.csv");
     	try {
-			List<Voter> test2 = test.parseVoters();
-			for (Voter v : test2) {
-				System.out.println(v.GetID());
-				for (Candidate c : v.GetChoices()) {
-					System.out.println(c.GetName());
-				}
-			}
+    		votes = test.ParseVoters();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	Election election = new Election();
+		election.addVoters(votes);
+		election.compute();
 	}
 }

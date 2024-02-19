@@ -13,6 +13,7 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.ICsvMapReader;
 import org.supercsv.prefs.CsvPreference;
 import org.supercsv.io.CsvMapReader;
+import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseInt;
 
 import com.srziebarth.Voter;
@@ -25,27 +26,27 @@ public class CSVReader {
 		this.file = filename;
 	}
 	
-	private static CellProcessor[] getProcessors() {
+	private static CellProcessor[] GetProcessors() {
 		final CellProcessor[] processors = new CellProcessor[] { 
-				new NotNull(), // first choice
-                new NotNull(), // second choice
-                new NotNull(), // third choice
+				new Optional(), // first choice
+                new Optional(), // second choice
+                new Optional(), // third choice
                 new ParseInt() // voter ID
         };
         
         return processors;
 	}
 	
-	public List<Voter> parseVoters() throws Exception{
+	public List<Voter> ParseVoters() throws Exception{
 		List<Voter> voters = new ArrayList<Voter>();
 		
 		ICsvMapReader mapReader = null;
         try {
                 mapReader = new CsvMapReader(new FileReader(file), CsvPreference.STANDARD_PREFERENCE);
                 
-                // the header columns are used as the keys to the Map
+                // The header columns are used as the keys to the map
                 final String[] header = mapReader.getHeader(true);
-                final CellProcessor[] processors = getProcessors();
+                final CellProcessor[] processors = GetProcessors();
                 
                 Map<String, Object> votesMap;
                 Map<String, Candidate> candidatesMap = new HashMap<>();
@@ -53,7 +54,10 @@ public class CSVReader {
                 while( (votesMap = mapReader.read(header, processors)) != null ) {
                 	Candidate firstChoice;
                 	String firstChoiceName = (String) votesMap.get("First Choice");
-                	if (candidatesMap.containsKey(firstChoiceName)) {
+                	if (firstChoiceName == null) {
+                		firstChoice = null;
+                	}
+                	else if (candidatesMap.containsKey(firstChoiceName)) {
                 		firstChoice = candidatesMap.get(firstChoiceName);
                 	}
                 	else {
@@ -63,7 +67,10 @@ public class CSVReader {
                 	
                 	Candidate secondChoice;
                 	String secondChoiceName = (String) votesMap.get("Second Choice");
-                	if (candidatesMap.containsKey(secondChoiceName)) {
+                	if (secondChoiceName == null) {
+                		secondChoice = null;
+                	}
+                	else if (candidatesMap.containsKey(secondChoiceName)) {
                 		secondChoice = candidatesMap.get(secondChoiceName);
                 	}
                 	else {
@@ -73,7 +80,10 @@ public class CSVReader {
                 	
                 	Candidate thirdChoice;
                 	String thirdChoiceName = (String) votesMap.get("Third Choice");
-                	if (candidatesMap.containsKey(thirdChoiceName)) {
+                	if (thirdChoiceName == null) {
+                		thirdChoice = null;
+                	}
+                	else if (candidatesMap.containsKey(thirdChoiceName)) {
                 		thirdChoice = candidatesMap.get(thirdChoiceName);
                 	}
                 	else {
